@@ -7,13 +7,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class UrlFetchMaster {
+
     public void start() {
-        // 1. get media list
-        // s3でもないしdbでもない。実装と直結するから
+        // s3でもないしdbでもない。実装と直結するため
         List.of(Medium.values())
-            // 2. それぞれに合わせたcrawlerをfactoryから取得しasyncにわたす
             .forEach(medium -> {
-                UrlFetchBotFactory.getUrlFetchBot(medium).run();
-        });
+                // TODO: asyncになってる?
+                UrlFetchBotFactory.getUrlFetchBot(medium.getName()).run();
+            });
     }
 }

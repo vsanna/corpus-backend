@@ -1,0 +1,58 @@
+version: '2'
+services:
+  #  mysql:
+  #    image: mysql:5.7.16
+  #    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
+  #    ports:
+  #      - "3308:3306"
+  #    volumes:
+  #      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+  #    environment:
+  #      - MYSQL_ROOT_PASSWORD=root
+  redis:
+    image: redis:4.0.11
+    command: redis-server
+    ports:
+      - "6388:6379"
+  #  zookeeper:
+  #    image: wurstmeister/zookeeper
+  #    ports:
+  #      - "2188:2181"
+  #  kafka:
+  #    image: wurstmeister/kafka:1.1.0
+  #    depends_on:
+  #      - zookeeper
+  #    ports:
+  #      - "9098:9098"
+  #    volumes:
+  #      - /var/run/docker.sock:/var/run/docker.sock
+  #    environment:
+  #      #KAFKA_ADVERTISED_HOST_NAME: localhost
+  #      KAFKA_ADVERTISED_LISTENERS: INSIDE://localhost:9098
+  #      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+  #      KAFKA_LISTENERS: INSIDE://:9098
+  #      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT
+  #      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+
+  # For aws s3
+  minio:
+    image: minio/minio
+    command: server --compat /data
+    ports:
+      - "9101:9000"
+    volumes:
+      - "./minio:/data"
+    environment:
+      - "MINIO_ACCESS_KEY=MINIO_ACCESS_KEY"
+      - "MINIO_SECRET_KEY=MINIO_SECRET_KEY"
+  minioclient:
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      until (/usr/bin/mc config host add myminio http://minio:9000 MINIO_ACCESS_KEY MINIO_SECRET_KEY) do echo '...waiting...' && sleep 1; done;
+      /usr/bin/mc mb myminio/paypay-kyc-images-dev;
+      exit 0;
+      "
+
