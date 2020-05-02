@@ -62,8 +62,7 @@ public class CrawlerTopicConsumer {
                     CrawlerEvent event = mapper.readValue(message, CrawlerEvent.class);
                     switch (event.getEventType()) {
                         case FETCHED_CONTENT:
-                            crawlerService.fetchedContent(event);
-                            parserService.fetchedContent(event);
+                            parserService.createWordList(event);
                             break;
                         case FETCHED_URL:
                             // TODO/NOTE: urlFetcherと微妙に違う。予めstartさせたところにこれを渡したい。

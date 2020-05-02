@@ -5,3 +5,10 @@ GRANT ALL ON corpus.* TO corpus_user;
 GRANT ALL ON corpus.* TO flyway;
 # 1. run these queries
 # 2. あとはflyway任せ
+
+# V1_1の実行後
+LOAD DATA LOCAL INFILE '/Users/ryu.ishikawa/rep/corpus/frequent_words.csv'
+    INTO TABLE `frequent_words`
+    FIELDS TERMINATED BY ','
+    (@word, @rank)
+    SET word = @word, rank = @rank;

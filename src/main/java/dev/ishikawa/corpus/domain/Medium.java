@@ -11,9 +11,8 @@ import org.slf4j.LoggerFactory;
 public enum Medium {
 
     // TODO: refactor: Mediumを単に文字列の集合とし、url取得などのロジックは別クラスにする
-    //
-    NEWYORK_TIMES(MediumName.NEWYORK_TIMES, "https://www.nytimes.com", "/", 0),
-    TECH_CRUNCH(MediumName.TECH_CRUNCH, "https://techcrunch.com", "/startups", 1000);
+    NEWYORK_TIMES(MediumName.NEWYORK_TIMES, "https://www.nytimes.com", "section/technology", 0),
+    TECH_CRUNCH(MediumName.TECH_CRUNCH, "https://techcrunch.com", "startups", 1000);
 
     public enum MediumName {NEWYORK_TIMES, TECH_CRUNCH}
 

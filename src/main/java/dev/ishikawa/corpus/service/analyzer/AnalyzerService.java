@@ -5,5 +5,9 @@ import org.springframework.stereotype.Service;
 @Service
 public interface AnalyzerService {
 
-    void startAnalysis();
+    void startAnalysisForDaily();
+
+    void startAnalysisForWeekly();
+
+    void startAnalysisForMonthly();
 }

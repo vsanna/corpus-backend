@@ -11,7 +11,7 @@ public class ParserServiceImpl implements ParserService {
     private ParserMaster parserMaster;
 
     @Override
-    public void fetchedContent(CrawlerEvent event) {
+    public void createWordList(CrawlerEvent event) {
         parserMaster.start(Integer.valueOf(event.getPayload().get("articleId")));
     }
 }

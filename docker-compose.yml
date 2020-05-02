@@ -9,6 +9,11 @@ services:
   #      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
   #    environment:
   #      - MYSQL_ROOT_PASSWORD=root
+  mongo:
+    container_name: codequality-server-mongo
+    image: mongo:4.2
+    ports:
+      - 27017:27017
   redis:
     image: redis:4.0.11
     command: redis-server

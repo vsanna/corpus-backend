@@ -1,6 +1,5 @@
 package dev.ishikawa.corpus.domain;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 import javax.persistence.Column;
@@ -8,8 +7,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,7 +20,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Table(name = "crawler_articles")
 @Data
-public class CrawlerArticle implements Serializable {
+public class CrawlerArticle extends ModelBase {
 
     private static final long serialVersionUID = 1L;
 
@@ -47,6 +44,9 @@ public class CrawlerArticle implements Serializable {
     @Column(name = "html_file_name")
     private String htmlFileName;
 
+    @Column(name = "wordlist_file_name")
+    private String wordlistFileName;
+
     @Default
     @Column(name = "parse_status", nullable = false)
     private Integer parseStatusCode = 0;
@@ -54,12 +54,12 @@ public class CrawlerArticle implements Serializable {
     // TODO: このmappingを省略したい
     public ParseStatus getParseStatus() {
         return List.of(ParseStatus.values()).stream()
-            .filter(status -> status.getCode() == parseStatusCode)
-            .findFirst()
-            .orElseThrow(() -> {
-                // TODO: appを壊してほしい
-                throw new RuntimeException("invalid status");
-            });
+                .filter(status -> status.getCode() == parseStatusCode)
+                .findFirst()
+                .orElseThrow(() -> {
+                    // TODO: appを壊してほしい
+                    throw new RuntimeException("invalid status");
+                });
     }
 
     @Default
@@ -69,29 +69,11 @@ public class CrawlerArticle implements Serializable {
 
     public Medium getMediaName() {
         return List.of(Medium.values()).stream()
-            .filter(status -> status.getCode() == mediaTypeCode)
-            .findFirst()
-            .orElseThrow(() -> {
-                // TODO: appを壊してほしい
-                throw new RuntimeException("invalid status");
-            });
-    }
-
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    // TODO: move to base class
-    @PrePersist
-    public void onPrePersist() {
-        setCreatedAt(LocalDateTime.now());
-        setUpdatedAt(LocalDateTime.now());
-    }
-
-    @PreUpdate
-    public void onPreUpdate() {
-        setUpdatedAt(LocalDateTime.now());
+                .filter(status -> status.getCode() == mediaTypeCode)
+                .findFirst()
+                .orElseThrow(() -> {
+                    // TODO: appを壊してほしい
+                    throw new RuntimeException("invalid status");
+                });
     }
 }

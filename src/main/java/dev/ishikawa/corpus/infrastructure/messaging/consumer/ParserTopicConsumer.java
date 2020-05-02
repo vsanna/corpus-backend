@@ -51,11 +51,8 @@ public class ParserTopicConsumer {
                     ParserEvent event = mapper.readValue(message, ParserEvent.class);
                     switch (event.getEventType()) {
                         case PARSED_CONTENT:
-                            crawlerService.parsedContent(event);
-                            break;
                         case FAILED_PARSING_CONTENT:
-                            // TODO
-                            log.error("failed parsing content");
+                            crawlerService.parsedContent(event);
                             break;
                         default:
                             throw new RuntimeException(

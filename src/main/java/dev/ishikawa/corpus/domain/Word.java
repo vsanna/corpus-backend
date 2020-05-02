@@ -18,8 +18,31 @@ public class Word {
 
     public String toRow() {
         return String.join(
-            "\t",
-            List.of(word, originalForm, type, sentence.replaceAll("\t", "__"))
+                "\t",
+                List.of(word, originalForm, type, sentence.replaceAll("\t", "__"))
         );
+    }
+
+    public static Word fromStringRow(String row) {
+        String[] tokens = row.split("\t");
+        return Word.builder()
+                .word(tokens[0])
+                .originalForm(tokens[1])
+                .type(tokens[2])
+                .sentence(tokens[3].replaceAll("__", "\t"))
+                .build();
+    }
+
+    @Override
+    public String toString() {
+        return "Word{" +
+                "word='" + word + '\'' +
+                ", originalForm='" + originalForm + '\'' +
+                ", type='" + type + '\'' +
+                '}';
+    }
+
+    public String getUniformWord() {
+        return this.getOriginalForm().equals("O") ? this.getWord() : this.getOriginalForm();
     }
 }

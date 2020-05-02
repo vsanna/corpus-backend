@@ -1,0 +1,7 @@
+mailer:
+  analysisReport:
+    subject: analysis report has been made for {0}
+common:
+  date:
+    labels:
+      daily: Daily

@@ -19,6 +19,8 @@ configurations {
 
 repositories {
     mavenCentral()
+    // since part of crawler4j's dependencies are stored here
+    maven { url "https://repo.spring.io/plugins-release/" }
 }
 
 ext {
@@ -28,12 +30,15 @@ ext {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 //    implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
 //    implementation 'org.springframework.cloud:spring-cloud-starter-aws'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-hystrix'
     implementation 'org.springframework.cloud:spring-cloud-stream'
+
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'mysql:mysql-connector-java'
@@ -57,6 +62,22 @@ dependencies {
     implementation platform('com.amazonaws:aws-java-sdk-bom:1.11.771')
     implementation 'com.amazonaws:aws-java-sdk-s3'
 
+    // html fetcher
+    implementation 'org.jsoup:jsoup:1.13.1'
+    // crawler
+    implementation 'edu.uci.ics:crawler4j:4.4.0'
+
+    // yamlでmessage.properties定義
+    implementation 'net.rakugakibox.util:yaml-resource-bundle:1.1'
+
+
+    // TODO: use google translation later
+    // com.google.cloud:google-cloud-translate:1.94.5
+    // https://cloud.google.com/translate/docs/simple-translate-call?hl=ja
+
+    // reactor
+    implementation "io.projectreactor:reactor-core:3.3.4.RELEASE"
+    testImplementation "io.projectreactor:reactor-test:3.3.4.RELEASE"
 }
 
 dependencyManagement {

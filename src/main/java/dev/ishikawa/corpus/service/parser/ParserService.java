@@ -6,5 +6,5 @@ import org.springframework.stereotype.Service;
 @Service
 public interface ParserService {
 
-    void fetchedContent(CrawlerEvent event);
+    void createWordList(CrawlerEvent event);
 }
