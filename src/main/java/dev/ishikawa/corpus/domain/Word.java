@@ -26,10 +26,10 @@ public class Word {
     public static Word fromStringRow(String row) {
         String[] tokens = row.split("\t");
         return Word.builder()
-                .word(tokens[0])
-                .originalForm(tokens[1])
-                .type(tokens[2])
-                .sentence(tokens[3].replaceAll("__", "\t"))
+                .word(tokens[0].trim())
+                .originalForm(tokens[1].trim())
+                .type(tokens[2].trim())
+                .sentence(tokens[3].replaceAll("__", "\t").trim())
                 .build();
     }
 

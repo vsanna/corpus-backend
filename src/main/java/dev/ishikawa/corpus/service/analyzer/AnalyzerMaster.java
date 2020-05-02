@@ -12,6 +12,7 @@ import dev.ishikawa.corpus.repository.FrequentWordRepository;
 import dev.ishikawa.corpus.repository.RankingRepository;
 import dev.ishikawa.corpus.repository.file.FileRepository;
 import dev.ishikawa.corpus.service.crawler.CrawlerService;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -22,7 +23,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.bouncycastle.util.Strings;
 import org.springframework.data.util.Pair;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -60,23 +60,25 @@ public class AnalyzerMaster {
         runAnalysis(from, to, Type.MONTHLY);
     }
 
+    // TODO: filtered_wordsも除外条件に加える
     private List<Record> aggregateToRecords(List<CrawlerArticle> articles, Set<String> frequentWords) {
         log.info("analysis target articles: {}", articles.size());
         return Flux.fromIterable(articles)
                 .parallel()
                 .map(article -> fileRepository.getObject(article.getWordlistFileName()))
                 .filter(Optional::isPresent)
-                .map(bytes -> Strings.fromByteArray(bytes.get()))
+                .map(bytes -> new String(bytes.get(), StandardCharsets.UTF_8))
                 .flatMap(stringWordList -> Flux.fromIterable(List.of(stringWordList.split("\n"))))
                 .map(Word::fromStringRow)
-                .filter(word -> !frequentWords.contains((word.getUniformWord()).toLowerCase()))
+                .filter(word -> !frequentWords.contains((word.getUniformWord()).toLowerCase()) &&
+                        !frequentWords.contains((word.getWord()).toLowerCase()))
                 .sequential()
                 .toStream()
                 .collect(Collectors.groupingBy((word) -> Pair.of(word.getWord(), word.getUniformWord())))
                 .entrySet().stream()
                 .map(wordWithGroup -> {
                     RecordBuilder recordBuilder = Record.builder();
-                    List<String> sentences = wordWithGroup.getValue().stream().map(Word::getSentence).collect(Collectors.toList());
+                    List<String> sentences = wordWithGroup.getValue().stream().map(Word::getSentence).distinct().collect(Collectors.toList());
                     return recordBuilder
                             .word(wordWithGroup.getKey().getFirst())
                             .originalForm(wordWithGroup.getKey().getSecond())
@@ -97,7 +99,15 @@ public class AnalyzerMaster {
 
         List<Record> recordList = aggregateToRecords(crawlerService.getArticleWithScope(from, to), frequentWords);
         int recordLen = recordList.size();
-        int rankingLen = Math.min(recordLen, 20); // TODO: move 20
+        if (recordLen < 20) {
+            log.error("length of records is less than expected value.");
+            return;
+        }
+
+        // TODO: remove
+        log.info("recordList size: {}", recordList.size());
+
+        int rankingLen = Math.min(recordLen, 50); // TODO: move 590
         Ranking ranking = Ranking.builder()
                 .type(type)
                 .from(from).to(to)

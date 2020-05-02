@@ -16,8 +16,8 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 public class FileRepositoryS3 implements FileRepository, InitializingBean {
 
-    private AwsProperties awsProperties;
-    private AmazonS3 s3Client;
+    private final AwsProperties awsProperties;
+    private final AmazonS3 s3Client;
 
     public Optional<byte[]> getObject(String key) {
         String bucket = awsProperties.getBucketName();
@@ -29,7 +29,7 @@ public class FileRepositoryS3 implements FileRepository, InitializingBean {
             return Optional.of(response.getObjectContent().readAllBytes());
         } catch (Exception e) {
             log.warn("couldn't handle request or response from s3 with bucket:{} and key:{}.",
-                bucket, key);
+                    bucket, key);
             throw new RuntimeException(e);
         }
     }
@@ -40,14 +40,14 @@ public class FileRepositoryS3 implements FileRepository, InitializingBean {
         objectMetadata.setContentLength(data.length);
         log.info("Uploading S3 object at key: {}", key);
         s3Client.putObject(awsProperties.getBucketName(), key, new ByteArrayInputStream(data),
-            objectMetadata);
+                objectMetadata);
     }
 
     @Override
     public void afterPropertiesSet() {
         if (!s3Client.doesBucketExistV2(awsProperties.getBucketName())) {
             log.info("Amazon S3 bucket={} does not exist, creating.",
-                awsProperties.getBucketName());
+                    awsProperties.getBucketName());
             s3Client.createBucket(awsProperties.getBucketName());
         }
     }

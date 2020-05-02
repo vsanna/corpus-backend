@@ -34,26 +34,50 @@ public class ParserWorker {
     public void run(CrawlerArticle article) {
         List<Word> words = new ArrayList<>();
 
+        List<String> sentences = List.of(article.getBody().split("\\."));
+
         // NOTE: https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html
-        List.of(article.getBody().split("\\. ")).stream().forEach(sentence -> {
-            String[] tokens = tokenizer.tokenize(sentence);
-            String[] tags = posTagger.tag(tokens);
-            String[] lemmatize = lemmatizer.lemmatize(tokens, tags);
+        String[] tokens = tokenizer.tokenize(article.getBody());
+        String[] tags = posTagger.tag(tokens);
+        String[] lemmatize = lemmatizer.lemmatize(tokens, tags);
 
-            for (int i = 0; i < tokens.length; i++) {
-                if (!tags[i].matches("[A-Z]+\\$?")) {
-                    continue;
-                }
+        for (int i = 0; i < tokens.length; i++) {
 
-                words.add(
-                        Word.builder()
-                                .word(tokens[i])
-                                .type(tags[i])
-                                .originalForm(lemmatize[i])
-                                .sentence(sentence).build()
-                );
+            final String word = tokens[i].trim();
+            final String tag = tags[i].trim();
+            final String lemm = lemmatize[i].trim();
+
+            // tagが不正なものは除外
+            if (!tag.matches("[A-Z]+\\$?")) {
+                continue;
             }
-        });
+            // 2文字以上の単語に限定する
+            if (!word.matches("[a-zA-Z0-9]{2,}")) {
+                continue;
+            }
+
+            // 特定のtag typeを無視
+            // CD: cardinal number, 基数
+            // NNP: 固有名詞
+            // NNPS: 固有名詞複数形
+            if (List.of("CD", "NNP", "NNPS").contains(tag)) {
+                continue;
+            }
+
+            log.debug("word: {}, tag: {}, lemmatize: {}", word, tag, lemm);
+
+            words.add(
+                    Word.builder()
+                            .word(word)
+                            .type(tag)
+                            .originalForm(lemm)
+                            .sentence(sentences.stream()
+                                    .filter(sentence -> sentence.trim().toLowerCase().contains(word.toLowerCase()))
+                                    .findFirst().orElse("dummy sentenec. this shold be handeld as an error"))
+                            .build()
+                    // TODO: .でsplitすると本来位置単語のものも分割され正しく評価できない
+            );
+        }
 
         String wordlistFilename = upload(article, words);
         article.setWordlistFileName(wordlistFilename);
